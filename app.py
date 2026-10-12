@@ -332,11 +332,18 @@ def fetch(url, maxb=8 * 1024 * 1024):
         if p.scheme not in ("http", "https") or not p.hostname or p.port not in (None, 80, 443, 8080, 8443):
             raise Err("Please paste a valid http(s) link")
         try:
-            r = sess.get(url, stream=True, timeout=(6, 15), allow_redirects=False,
-                         headers={"User-Agent": "Mozilla/5.0 (compatible; ToolHub)"})
+                    r = sess.get(url, stream=True, timeout=(6, 15), allow_redirects=False,
+                     headers={
+                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                         "Accept-Language": "en-US,en;q=0.5",
+                         "Referer": "https://www.google.com/"
+                     })
         except requests.RequestException:
-            raise Err("Could not open the link. Make sure it is public (no login needed).", 422)
-        if r.status_code in (301, 302, 303, 307, 308) and r.headers.get("Location"):
+                if r.status_code != 200:
+        if r.status_code in (403, 401):
+            raise Err("This SSC link needs login. Please download the Response Sheet PDF from SSC site and upload the PDF file here instead of link. (SSC blocks server links)", 422)
+        raise Err("The link returned error %d" % r.status_code, 422)
             url = urljoin(url, r.headers["Location"])
             r.close()
             continue
