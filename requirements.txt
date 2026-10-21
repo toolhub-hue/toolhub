@@ -1,9 +1,0 @@
-flask
-pymongo[srv]
-requests
-gunicorn
-PyPDF2
-beautifulsoup4
-python-pptx
-python-dotenv
-Pillow
